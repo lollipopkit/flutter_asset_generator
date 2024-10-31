@@ -229,6 +229,8 @@ class R {
 watch: false
 # watch: true
 
+# 是否生成预览注释
+# 例如：/// ![preview](file:///path/to/img.jpg)
 preview: false
 
 output: lib/const/r.dart

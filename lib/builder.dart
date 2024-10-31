@@ -185,12 +185,12 @@ class ResourceDartBuilder {
 
     final StringBuffer source = StringBuffer();
     final Template template = Template(className, config);
-    source.write(template.license);
+    source.write(Template.license);
     source.write(template.classDeclare);
     for (final String path in allImageList) {
-      source.write(template.formatFiled(path, projectRootPath, isPreview));
+      source.write(template.formatOnePath(path, projectRootPath, isPreview));
     }
-    source.write(template.classDeclareFooter);
+    source.write(Template.classDeclareFooter);
 
     final Stopwatch sw = Stopwatch();
     sw.start();

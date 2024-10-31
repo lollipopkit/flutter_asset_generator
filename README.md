@@ -225,10 +225,11 @@ Next command config option also support in config file.
 But the command line option has a higher priority than the config file.
 
 ```yaml
-
 watch: false
 # watch: true
 
+# Whether to generate preview comments in the generated file.
+# eg.: /// ![preview](file:///path/to/file.jpg)
 preview: false
 
 output: lib/const/r.dart
