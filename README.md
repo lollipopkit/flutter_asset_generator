@@ -31,33 +31,24 @@ This library is based on dartlang's build library.
 
 ## Usage
 
-### Run from source
+### Run
 
-Add `dart` to your `$PATH` environment.
+#### As a dependency
 
-```bash
-git clone https://github.com/fluttercandies/flutter_asset_generator
-cd flutter_asset_generator
-dart pub get
-dart bin/asset_generator.dart $flutter_project
+1. Add `flutter_asset_generator` to your `pubspec.yaml` file.
+
+```yaml
+dev_dependencies:
+  flutter_asset_generator: latest_version
 ```
 
-### Run from pub global
+2. Run `dart run flutter_asset_generator` in the root directory of your flutter project.
 
-1. Install using [pub global][]:
+#### Add as a global command
 
-```bash
-dart pub global activate flutter_asset_generator
+1. Run `dart pub global activate flutter_asset_generator` to install the package globally.
 
-# or 
-
-dart pub global activate -s git https://github.com/fluttercandies/flutter_asset_generator.git                 
-```
-
-1. Run below commands:
-`fgen`
-or
-`fgen -s $flutter_project`
+2. Run `fgen` in the root directory of your flutter project.
 
 ### Support options
 
@@ -131,7 +122,7 @@ It can be used to prompt the configuration file.
 }
 ```
 
-### exclude and include rules
+### Exclude and include rules
 
 The file is yaml format, every element is `glob` style.
 

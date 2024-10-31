@@ -23,15 +23,19 @@
 
 ## 安装及使用
 
-### 使用源码的方式
+### 通过开发依赖
 
-添加 `dart` 至环境变量
+1. 在 `pubspec.yaml` 文件中添加 `flutter_asset_generator` 依赖：
+
+```yaml
+dev_dependencies:
+  flutter_asset_generator: latest_version
+```
+
+2. 在 flutter 项目根目录下执行：
 
 ```bash
-git clone https://github.com/fluttercandies/flutter_asset_generator
-cd flutter_asset_generator
-dart pub get
-dart bin/asset_generator.dart $flutter_project
+dart run flutter_asset_generator
 ```
 
 ### 通过 pub global 运行
