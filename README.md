@@ -1,138 +1,64 @@
 # flutter_asset_generator
 
-English | [中文文档](README_CHN.md)
-
 Automatically generate the dart file for pubspec.yaml
-
-The purpose of this library is to help flutter developers
-automatically generate asset corresponding dart files
-to help developers release their hands from this meaningless job,
-and the open source community has a lot of the same functionality.
-
-This library is based on dartlang's build library.
-
-- [flutter\_asset\_generator](#flutter_asset_generator)
-  - [screenshot](#screenshot)
-  - [Usage](#usage)
-    - [Run from source](#run-from-source)
-    - [Run from pub global](#run-from-pub-global)
-    - [Support options](#support-options)
-  - [File name](#file-name)
-  - [Config file](#config-file)
-    - [Config schema for vscode](#config-schema-for-vscode)
-    - [exclude and include rules](#exclude-and-include-rules)
-    - [Replacement Rules](#replacement-rules)
-      - [Example](#example)
-    - [Other config](#other-config)
-
-## screenshot
-
-![img](https://raw.githubusercontent.com/CaiJingLong/some_asset/master/asset_gen_3.0.gif)
 
 ## Usage
 
 ### Run
 
-#### As a dependency
-
-1. Add `flutter_asset_generator` to your `pubspec.yaml` file.
-
+`pubspec.yaml`:
 ```yaml
 dev_dependencies:
-  flutter_asset_generator: latest_version
+  flutter_asset_generator:
+    git:
+      url: https://github.com/lollipopkit/flutter_asset_generator
+      ref: master
 ```
 
-2. Run `dart run flutter_asset_generator` in the root directory of your flutter project.
-
-#### Add as a global command
-
-1. Run `dart pub global activate flutter_asset_generator` to install the package globally.
-
-2. Run `fgen` in the root directory of your flutter project.
+```bash
+dart run flutter_asset_generator
+```
 
 ### Support options
 
-Use `$ fgen -h` or `$ fgen --help` see usage document.
-
 ```bash
-fgen -h
--w, --[no-]watch    Continue to monitor changes after execution of orders.
-                    (defaults to on)
-
--p, --[no-]preview  Generate file with preview comments.
-                    (defaults to on)
-
--o, --output        Your resource file path.
-                    If it's a relative path, the relative flutter root directory
-                    (defaults to "lib/const/resource.dart")
-
--s, --src           Flutter project root path
-                    (defaults to ".")
-
--n, --name          The class name for the constant.
-                    (defaults to "R")
-
--h, --[no-]help     Help usage
-
--d, --[no-]debug    debug info
-```
-
-## File name
-
-`Space`, '.' and '-' in the path will be converted to `_`. `@` will be converted to `_AT_`.
-
-convert filed name example:
-
-```log
-images/1.png => IMAGES_PNG
-images/hello_world.jpg => IMAGES_HELLO_WORLD_JPG
-images/hello-world.jpg => IMAGES_HELLO_WORLD_JPG
-```
-
-Errors will occur in the following situations:
-
-```bash
-images/
-├── main_login.png
-├── main/
-    ├── login.png
-```
-
-Because the two field names will be exactly the same.
-
-## Config file
-
-The location of the configuration file is conventional.
-Configuration via commands is **not supported**.
-The specified path is `fgen.yaml` in the flutter project root directory.
-
-### Config schema for vscode
-
-Install [YAML Support](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) plugin.
-
-Config your vscode `settings.json` file.
-
-It can be used to prompt the configuration file.
-
-```json
-{
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/fluttercandies/flutter_asset_generator/master/fgen_schema.json": ["fgen.yaml"]
-  }
-}
+-o, --output             Output resource file path
+-s, --src                Flutter project root path
+                         (defaults to ".")
+-n, --name               The generated class name
+-w, --[no-]watch         Monitor changes after execution of orders.
+-p, --preview            Enable preview comments
+-r, --replace_strings    Enable replace strings ('assets/image.png' -> 'R.ASSETS_IMAGE_PNG')
+                         (defaults to false)
+-d, --debug              debug mode
+-h, --help               Print this usage information.
 ```
 
 ### Exclude and include rules
 
 The file is yaml format, every element is `glob` style.
-
 The name of the excluded file is under the `exclude` node, and the type is a string array. If no rule is included, it means no file is excluded.
-
 The `include` node is the name of the file that needs to be imported, and the type is a string array. If it does not contain any rules, all file are allowed.
 
-In terms of priority, exclude is higher than include, in other words:
 
-First import the file according to the include nodes, and then exclude the files.
+### Configs
+
+```yaml
+watch: false
+# watch: true
+
+# Whether to generate preview comments in the generated file.
+# eg.: /// ![preview](file:///path/to/file.jpg)
+preview: false
+
+output: lib/const/r.dart
+# output: lib/const/resource.dart
+
+name: RRR
+
+# replace all assets strings to the vars defined in the generated file
+replace: true
+```
 
 ### Replacement Rules
 
@@ -188,54 +114,32 @@ images
 ```
 
 ```dart
-/// Generate by [asset_generator](https://github.com/fluttercandies/flutter_asset_generator) library.
-/// PLEASE DO NOT EDIT MANUALLY.
 class R {
   const R._();
 
   /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/assets/bluetoothon-fjdfj.png)
   static const String ASSETS_BLUETOOTHON_FJDFJ_PNG = 'assets/bluetoothon-fjdfj.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/assets/bluetoothon.png)
-  static const String ASSETS_BLUETOOTHON_PNG = 'assets/bluetoothon.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/assets/camera.png)
-  static const String ASSETS_CAMERA_PNG = 'assets/camera.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/images/audio.png)
-  static const String IMAGES_AUDIO_PNG = 'images/audio.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/images/bluetoothoff.png)
-  static const String IMAGES_BLUETOOTHOFF_PNG = 'images/bluetoothoff.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/images/child.png)
-  static const String IMAGES_CHILD_PNG = 'images/child.png';
-
-  /// ![preview](file:///Users/jinglongcai/code/dart/self/flutter_resource_generator/example/images/course.png)
-  static const String IMAGES_COURSE_PNG = 'images/course.png';
 }
 ```
 
-### Other config
+## Config file
 
-Since version 1.1.0:
+The location of the configuration file is conventional.
+Configuration via commands is **not supported**.
+The specified path is `fgen.yaml` in the flutter project root directory.
 
-Next command config option also support in config file.
+### Config schema for vscode
 
-But the command line option has a higher priority than the config file.
+Install [YAML Support](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) plugin.
 
-```yaml
-watch: false
-# watch: true
+Config your vscode `settings.json` file.
 
-# Whether to generate preview comments in the generated file.
-# eg.: /// ![preview](file:///path/to/file.jpg)
-preview: false
+It can be used to prompt the configuration file.
 
-output: lib/const/r.dart
-# output: lib/const/resource.dart
-
-name: RRR
+```json
+{
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/fluttercandies/flutter_asset_generator/master/fgen_schema.json": ["fgen.yaml"]
+  }
+}
 ```
-
-[pub global]: https://dart.dev/tools/pub/cmd/pub-global#running-a-script-from-your-path

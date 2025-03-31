@@ -3,8 +3,12 @@ description: example
 version: 0.0.1
 homepage: https://github.com
 
-environment: 
-  sdk: ">=2.12.0 <4.0.0"
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dev_dependencies:
+  flutter_asset_generator:
+    path: ../.
 
 flutter:
   assets:

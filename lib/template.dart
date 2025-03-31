@@ -15,7 +15,7 @@ class Template {
   late final Replacer replacer = Replacer(config: config);
 
   static const String license = '''
-/// Generate by [asset_generator](https://github.com/fluttercandies/flutter_asset_generator) library.
+/// Generate by [asset_generator](https://github.com/lollipopkit/flutter_asset_generator) library.
 /// PLEASE DO NOT EDIT MANUALLY.
 // ignore_for_file: constant_identifier_names\n''';
 
@@ -25,15 +25,13 @@ abstract final class $className {\n
 
   static const String classDeclareFooter = '}\n';
 
-  String formatOnePath(String path, String projectPath, bool isPreview) {
-    if (isPreview) {
+  String formatOnePath(String path, String projectPath, bool addPreview) {
+    if (addPreview) {
       return '''
-
   /// ![preview](file://$projectPath${path_library.separator}${_formatPreviewName(path)})
   static const String ${_formatFiledName(path)} = '$path';\n''';
     }
     return '''
-
   static const String ${_formatFiledName(path)} = '$path';\n''';
   }
 
@@ -43,14 +41,6 @@ abstract final class $className {\n
   }
 
   String _formatFiledName(String path) {
-    // path = path
-    //     .replaceAll('/', '_')
-    //     .replaceAll('.', '_')
-    //     .replaceAll(' ', '_')
-    //     .replaceAll('-', '_')
-    //     .replaceAll('@', '_AT_');
-    // return path.toUpperCase();
-
     return replacer.replaceName(path).toUpperCase();
   }
 

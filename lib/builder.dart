@@ -20,7 +20,6 @@ const List<String> platformExcludeFiles = <String>[
   'desktop.ini',
 ];
 const int serverPort = 31313;
-Logger logger = Logger();
 
 class ResourceDartBuilder {
   // ResourceDartBuilder(String projectRootPath, this.outputPath) {
@@ -41,14 +40,13 @@ class ResourceDartBuilder {
       final List<String> assetPathList = _getAssetPath(pubYamlPath);
       logger.debug('The asset path list is: $assetPathList');
       generateImageFiles(assetPathList);
-      writeText('allImageList = $allImageList');
       logger.debug('the image is $allImageList');
       generateCode(className);
     } catch (e) {
       if (e is StackOverflowError && e.stackTrace != null) {
-        writeText(e.stackTrace!);
+        logger.debug(e.stackTrace!);
       } else {
-        writeText(e);
+        logger.debug(e);
       }
     }
     print('$_generateLogPrefix finish.');
@@ -59,19 +57,6 @@ class ResourceDartBuilder {
 
   String get projectRootPath => config.src;
   String get outputPath => config.output;
-
-  /// Write logs to the file
-  /// Defaults to `.dart_tools/fgen_log.txt`
-  void writeText(Object text, {File? file}) {
-    file ??= logFile;
-    if (!file.existsSync()) {
-      file.createSync(recursive: true);
-    }
-    file
-      ..writeAsStringSync(DateTime.now().toString(), mode: FileMode.append)
-      ..writeAsStringSync('  : $text', mode: FileMode.append)
-      ..writeAsStringSync('\n', mode: FileMode.append);
-  }
 
   /// Get asset paths from [yamlPath].
   List<String> _getAssetPath(String yamlPath) {
@@ -176,31 +161,87 @@ class ResourceDartBuilder {
     return res;
   }
 
-  /// Generate the dart code
-  void generateCode(String className) {
-    stopWatch();
-    writeText('Start writing records');
-    resourceFile.deleteSync(recursive: true);
-    resourceFile.createSync(recursive: true);
+  static final _findConstStrReg =
+      RegExp(r"([a-zA-Z0-9_]+)\s+=\s+\'([^\']*)\'");
 
-    final StringBuffer source = StringBuffer();
+  /// Generate the dart code
+  Future<void> generateCode(String className) async {
+    stopWatch();
+    logger.debug('Start writing records');
+    await resourceFile.delete(recursive: true);
+    await resourceFile.create(recursive: true);
+
+    final StringBuffer sb = StringBuffer();
     final Template template = Template(className, config);
-    source.write(Template.license);
-    source.write(template.classDeclare);
+    sb.write(Template.license);
+    sb.write(template.classDeclare);
+
+    final replaceMap = <String, String>{};
+
     for (final String path in allImageList) {
-      source.write(template.formatOnePath(path, projectRootPath, isPreview));
+      sb.write(template.formatOnePath(path, projectRootPath, isPreview));
+
+      if (config.replaceStrings) {
+        final String replacePath =
+            template.replacer.replaceName(path).toUpperCase();
+        replaceMap[path] = replacePath;
+      }
     }
-    source.write(Template.classDeclareFooter);
+    sb.write(Template.classDeclareFooter);
+
+    if (config.replaceStrings && replaceMap.isNotEmpty) {
+      logger.debug('Start replacing strings');
+      logger.debug('Replace map: $replaceMap');
+
+      /// Replace the strings in the dart files
+      final files = await Directory(join(projectRootPath, 'lib'))
+          .list(recursive: true)
+          .toList();
+      for (final FileSystemEntity file in files) {
+        if (file is File && file.path.endsWith('.dart')) {
+          // If the file is the resource file, skip it.
+          if (file.path == resourceFile.path) {
+            continue;
+          }
+
+          final content = await file.readAsString();
+          final replacedContent = content.replaceAllMapped(
+            _findConstStrReg,
+            (Match match) {
+              final String? name = match.group(2);
+              final group0 = match.group(0)!;
+              logger.debug(group0);
+              if (name == null) {
+                return group0;
+              }
+              final String? replaceName = replaceMap[name];
+              logger.debug('Replace $name to $replaceName');
+              if (replaceName == null) {
+                return group0;
+              }
+              final replaced = '${match.group(1)} = ${config.className}.$replaceName';
+              logger.debug(
+                'Replace $name to $replaceName in ${file.path}',
+              );
+              return replaced;
+            },
+          );
+          await file.writeAsString(replacedContent);
+        }
+      }
+    } else {
+      logger.debug('Not replacing strings');
+    }
 
     final Stopwatch sw = Stopwatch();
     sw.start();
-    final String formattedCode = formatFile(source.toString());
+    final String formattedCode = formatFile(sb.toString());
     sw.stop();
     print('Formatted records in ${sw.elapsedMilliseconds}ms');
     sw.reset();
     resourceFile.writeAsString(formattedCode);
     sw.stop();
-    writeText('End writing records ${sw.elapsedMilliseconds}');
+    logger.debug('End writing records ${sw.elapsedMilliseconds}');
   }
 
   /// Watch all paths

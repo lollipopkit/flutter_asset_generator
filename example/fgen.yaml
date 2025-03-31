@@ -15,4 +15,5 @@ preview: false
 # output: lib/const/r.dart
 # output: lib/const/resource.dart
 
-# name: RRR
+name: RR
+replace_strings: true

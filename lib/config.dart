@@ -20,11 +20,13 @@ class Config {
   static final String defaultPath = join('lib', 'const', 'resource.dart');
 
   final ArgResults results;
+
   late String src;
   late String output;
   late bool isWatch;
   late bool preview;
   late String className;
+  late bool replaceStrings;
   late YamlMap? configFileOptions;
 
   Filter? filter;
@@ -41,6 +43,7 @@ class Config {
     String? className = results['name'];
     bool? watch = results['watch'];
     bool? preview = results['preview'];
+    bool? replaceStrings = results['replace_strings'];
 
     YamlMap? yamlMap;
     if (configFile.existsSync()) {
@@ -53,6 +56,7 @@ class Config {
         className ??= yamlMap['name'] as String?;
         watch ??= yamlMap['watch'] as bool?;
         preview ??= yamlMap['preview'] as bool?;
+        replaceStrings ??= yamlMap['replace_strings'] as bool?;
       }
     }
 
@@ -60,17 +64,19 @@ class Config {
     className ??= 'R';
     watch ??= true;
     preview ??= true;
+    replaceStrings ??= false;
 
     this.src = src;
     this.output = output;
     this.className = className;
     isWatch = watch;
     this.preview = preview;
+    this.replaceStrings = replaceStrings;
     configFileOptions = yamlMap;
   }
 
   @override
   String toString() {
-    return 'Config{className: $className, src: $src, output: $output, isWatch: $isWatch, preview: $preview}';
+    return 'Config{className: $className, src: $src, output: $output, isWatch: $isWatch, preview: $preview, replaceStrings: $replaceStrings, configFileOptions: $configFileOptions}';
   }
 }

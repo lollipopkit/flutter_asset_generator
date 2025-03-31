@@ -1,9 +1,7 @@
-class Logger {
-  factory Logger() => _instance;
+var logger = Logger._(false);
 
-  Logger._();
-
-  static late final Logger _instance = Logger._();
+final class Logger {
+  Logger._(this.isDebug);
 
   bool isDebug = false;
 

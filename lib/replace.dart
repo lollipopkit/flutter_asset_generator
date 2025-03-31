@@ -1,8 +1,8 @@
 import 'package:flutter_asset_generator/config.dart';
 import 'package:yaml/yaml.dart';
 
-class RegexItem {
-  const RegexItem({
+class ReplaceItem {
+  const ReplaceItem({
     required this.from,
     required this.to,
   });
@@ -11,15 +11,13 @@ class RegexItem {
 }
 
 class Replacer {
-  Replacer({
-    required this.config,
-  }) {
+  Replacer({required this.config}) {
     init();
   }
 
   final Config config;
 
-  final Map<String, RegexItem> itemMap = <String, RegexItem>{};
+  final Map<String, ReplaceItem> itemMap = <String, ReplaceItem>{};
 
   void init() {
     final YamlMap? options = config.configFileOptions;
@@ -30,21 +28,21 @@ class Replacer {
           final Map<dynamic, dynamic> map = item as Map<dynamic, dynamic>;
           final String from = map['from'] as String? ?? '';
           final String to = map['to'] as String? ?? '';
-          itemMap[from] = RegexItem(from: from, to: to);
+          itemMap[from] = ReplaceItem(from: from, to: to);
         }
       }
     }
 
-    itemMap.putIfAbsent('/', () => const RegexItem(from: '/', to: '_'));
-    itemMap.putIfAbsent('.', () => const RegexItem(from: '.', to: '_'));
-    itemMap.putIfAbsent(' ', () => const RegexItem(from: ' ', to: '_'));
-    itemMap.putIfAbsent('-', () => const RegexItem(from: '-', to: '_'));
-    itemMap.putIfAbsent('@', () => const RegexItem(from: '@', to: '_AT_'));
+    itemMap.putIfAbsent('/', () => const ReplaceItem(from: '/', to: '_'));
+    itemMap.putIfAbsent('.', () => const ReplaceItem(from: '.', to: '_'));
+    itemMap.putIfAbsent(' ', () => const ReplaceItem(from: ' ', to: '_'));
+    itemMap.putIfAbsent('-', () => const ReplaceItem(from: '-', to: '_'));
+    itemMap.putIfAbsent('@', () => const ReplaceItem(from: '@', to: '_AT_'));
   }
 
   String replaceName(String path) {
     String result = path;
-    itemMap.forEach((String key, RegexItem value) {
+    itemMap.forEach((String key, ReplaceItem value) {
       result = result.replaceAll(value.from, value.to);
     });
     return result;
