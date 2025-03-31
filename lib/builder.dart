@@ -162,7 +162,7 @@ class ResourceDartBuilder {
   }
 
   static final _findConstStrReg =
-      RegExp(r"([a-zA-Z0-9_]+)\s+=\s+\'([^\']*)\'");
+      RegExp(r"\'([^\']*)\'");
 
   /// Generate the dart code
   Future<void> generateCode(String className) async {
@@ -208,21 +208,16 @@ class ResourceDartBuilder {
           final replacedContent = content.replaceAllMapped(
             _findConstStrReg,
             (Match match) {
-              final String? name = match.group(2);
+              final String? name = match.group(1);
               final group0 = match.group(0)!;
-              logger.debug(group0);
               if (name == null) {
                 return group0;
               }
               final String? replaceName = replaceMap[name];
-              logger.debug('Replace $name to $replaceName');
               if (replaceName == null) {
                 return group0;
               }
-              final replaced = '${match.group(1)} = ${config.className}.$replaceName';
-              logger.debug(
-                'Replace $name to $replaceName in ${file.path}',
-              );
+              final replaced = '${config.className}.$replaceName';
               return replaced;
             },
           );
